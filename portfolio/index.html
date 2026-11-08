@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pedro L. · Portfolio</title>
+<meta name="description" content="Python automation, API integrations, short-form video production, animated captions and PT/EN writing. Real projects with video, code and text samples.">
+<link rel="icon" href="media/logo.png">
+<style>
+:root { --bg:#0f0d1a; --card:#191530; --line:#2b2547; --txt:#f2effc; --sub:#b3abd4; --roxo:#7c3aed; --amarelo:#ffd23f; --verde:#3ddc97; }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--txt); font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; }
+main { max-width:900px; margin:0 auto; padding:32px 16px 48px; }
+a { color:var(--amarelo); }
+header { display:flex; gap:16px; align-items:center; margin-bottom:8px; }
+header img { width:64px; height:64px; border-radius:50%; border:2px solid var(--roxo); }
+h1 { margin:0; font-size:28px; }
+.lead { color:var(--sub); margin:10px 0 0; font-size:17px; }
+.chips { display:flex; flex-wrap:wrap; gap:8px; margin:16px 0 4px; padding:0; list-style:none; }
+.chips li { background:var(--card); border:1px solid var(--line); border-radius:999px; padding:3px 12px; font-size:14px; }
+nav { display:flex; flex-wrap:wrap; gap:6px 14px; margin:18px 0 8px; font-size:14px; }
+section { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:20px; margin:22px 0; }
+h2 { margin:0 0 4px; font-size:22px; }
+.kicker { color:var(--verde); font-size:12.5px; letter-spacing:1.5px; text-transform:uppercase; font-weight:700; }
+section p { margin:8px 0; }
+ul.pts { margin:8px 0; padding-left:20px; } ul.pts li { margin:4px 0; }
+.grid { display:grid; grid-template-columns:1fr 1fr; gap:18px; align-items:start; }
+.grid.v { grid-template-columns:minmax(0,300px) 1fr; }
+img.wide, video.wide { width:100%; border-radius:12px; border:1px solid var(--line); display:block; }
+video.tall { width:100%; max-width:300px; aspect-ratio:9/16; border-radius:12px; border:1px solid var(--line); background:#000; display:block; }
+pre { background:#0b0914; border:1px solid var(--line); border-radius:12px; padding:14px; overflow-x:auto; font-size:13px; line-height:1.45; margin:12px 0 0; }
+code { font-family:ui-monospace,Consolas,"Cascadia Code",monospace; }
+.k { color:#c792ea; } .s { color:#c3e88d; } .c { color:#6b6590; } .f { color:#82aaff; }
+.cols { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:10px; }
+.cols div { background:#0b0914; border:1px solid var(--line); border-radius:12px; padding:12px 14px; font-size:15px; }
+.cols h3 { margin:0 0 6px; font-size:13px; letter-spacing:1px; color:var(--amarelo); text-transform:uppercase; }
+.src { font-size:14px; color:var(--sub); }
+footer { color:var(--sub); font-size:14px; margin-top:28px; }
+@media (max-width:700px) { .grid, .grid.v, .cols { grid-template-columns:1fr; } video.tall { margin:0 auto; } h1 { font-size:24px; } }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <img src="media/logo.png" alt="">
+    <div>
+      <h1>Pedro L.</h1>
+      <div class="kicker">Developer · automation · video production</div>
+    </div>
+  </header>
+  <p class="lead">I build systems that do the repetitive work: Python automations, API integrations and a video pipeline that
+    publishes about 30 videos a week on two YouTube channels with no manual uploads. Brazilian, working in English and Portuguese,
+    developing systems since 2018 and invoicing through my own company.</p>
+  <ul class="chips">
+    <li>Python</li><li>PHP · MySQL</li><li>JavaScript</li><li>REST APIs · OAuth</li><li>YouTube Data API</li>
+    <li>FFmpeg</li><li>React (Remotion)</li><li>Whisper</li><li>Azure Speech</li><li>PT ⇄ EN</li>
+  </ul>
+  <nav>
+    <a href="#pipeline">Video pipeline</a><a href="#automation">Automation</a><a href="#shorts">Short-form videos</a>
+    <a href="#captions">Animated captions</a><a href="#writing">Writing &amp; translation</a><a href="#game">HTML5 game</a>
+  </nav>
+
+  <section id="pipeline">
+    <div class="kicker">Real project · running every day</div>
+    <h2>Video production and publishing on autopilot</h2>
+    <img class="wide" src="media/pipeline.jpg" alt="Pipeline: script, voice, render, upload, comments" loading="lazy">
+    <ul class="pts">
+      <li><strong>Scripts as data:</strong> each video is a JSON file with scenes, sources and visuals, checked before rendering.</li>
+      <li><strong>Voice and captions:</strong> neural voice with the timing of every word, so captions highlight the word being spoken.</li>
+      <li><strong>Render:</strong> React (Remotion) for the animations, FFmpeg for audio at -14 LUFS and file sizes for each platform.</li>
+      <li><strong>Publishing:</strong> YouTube Data API with OAuth: title, description, tags, language and schedule, with a daily quota budget.</li>
+      <li><strong>After publishing:</strong> replies to comments through the API and a daily metrics snapshot.</li>
+    </ul>
+    <pre><code><span class="c"># Licensed narration with word timings (Azure Speech SDK), used for client work</span>
+<span class="k">def</span> <span class="f">azure_tts</span>(text, voice, rate, mp3_path):
+    synth = speechsdk.SpeechSynthesizer(speech_config=cfg, audio_config=<span class="k">None</span>)
+    words = []
+
+    <span class="k">def</span> <span class="f">on_word</span>(evt):
+        <span class="k">if</span> evt.boundary_type == speechsdk.SpeechSynthesisBoundaryType.Word:
+            start = evt.audio_offset / <span class="s">1e7</span>
+            words.append({<span class="s">"start"</span>: start, <span class="s">"end"</span>: start + evt.duration.total_seconds(),
+                          <span class="s">"text"</span>: evt.text})
+
+    synth.synthesis_word_boundary.connect(on_word)
+    res = synth.speak_ssml_async(ssml(text, voice, rate)).get()
+    Path(mp3_path).write_bytes(res.audio_data)
+    <span class="k">return</span> words  <span class="c"># -> word-by-word captions in the render</span></code></pre>
+  </section>
+
+  <section id="automation">
+    <div class="kicker">Services</div>
+    <h2>Python automations and API integrations</h2>
+    <div class="grid">
+      <img class="wide" src="media/automation.jpg" alt="Automation examples" loading="lazy">
+      <ul class="pts">
+        <li>Scheduled scripts and bots: reports, file processing, uploads and alerts.</li>
+        <li>Integrations between your tools through REST APIs and webhooks (sheets, stores, YouTube, Telegram).</li>
+        <li>AI steps where they help: summaries, classification and draft replies, always with a human check.</li>
+        <li>Web systems in PHP and MySQL: admin panels, custom features and maintenance of existing systems.</li>
+        <li>Clean code with a README, so you can run and change it later.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="shorts">
+    <div class="kicker">Video</div>
+    <h2>Short-form videos with researched scripts</h2>
+    <div class="grid v">
+      <video class="tall" src="media/shorts-demo.mp4" poster="media/shorts-poster.jpg" controls preload="none" playsinline></video>
+      <div>
+        <p>Two sample Shorts, one in English and one in Portuguese, made with the same pipeline as my channels:
+          hook in the first second, fact-checked script, licensed neural voice, word-by-word captions, 3D illustrations,
+          sound effects and original music. Delivered as 1080x1920 MP4 with title, caption and hashtags.</p>
+        <p>My channels: <a href="https://www.youtube.com/@OPixelOculto" target="_blank" rel="noopener">Pixel Oculto</a> (Portuguese)
+          and <a href="https://www.youtube.com/@HiddenPixelHQ" target="_blank" rel="noopener">Hidden Pixel</a> (English).</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="captions">
+    <div class="kicker">Video</div>
+    <h2>Animated captions, word by word</h2>
+    <div class="grid v">
+      <video class="tall" src="media/captions-demo.mp4" poster="media/captions-poster.jpg" controls preload="none" playsinline></video>
+      <div>
+        <p>Your video comes back with the spoken word highlighted, plus an .SRT file for YouTube, TikTok and Reels.
+          Transcription runs locally (Whisper), so your footage is not sent to third-party services.</p>
+        <ul class="pts">
+          <li>Every transcript is proofread: in this demo the speech model heard "Dracast", and the delivered caption says "Dreamcast".</li>
+          <li>Your colors, font size and words per line. English or Portuguese.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="writing">
+    <div class="kicker">Text</div>
+    <h2>Script writing and PT ⇄ EN translation</h2>
+    <p>A real script from my channels, written in Portuguese and adapted to English. It is an adaptation, not a word-for-word copy:
+      same facts and sources, natural phrasing in each language.</p>
+    <div class="cols">
+      <div><h3>Português</h3>O cartucho do Nintendo Switch tem um gosto horrível. E é de propósito. Em dois mil e dezessete, quem colocou o
+        cartão na boca sentiu um amargo fortíssimo. A Nintendo confirmou: o cartão tem uma camada de benzoato de denatônio, uma das
+        substâncias mais amargas que existem. Ela não é tóxica. O motivo é o tamanho: o cartão é pequeno, e o amargo faz criança cuspir
+        antes de engolir. A mesma substância vai em produto de limpeza, pelo mesmo motivo.</div>
+      <div><h3>English</h3>The Nintendo Switch game card tastes awful. And it's on purpose. In twenty seventeen, people who put one in their
+        mouth got a shockingly bitter taste. Nintendo confirmed it: the card is coated with denatonium benzoate, one of the most bitter
+        substances known. It's non-toxic. The reason is the size: the card is tiny, and the bitter taste makes kids spit it out before
+        swallowing. The same chemical goes into cleaning products, for the same reason.</div>
+    </div>
+    <p class="src">Sources: <a href="https://mentalfloss.com/article/92881/nintendo-switch-game-cartridges-taste-terrible-very-good-reason" target="_blank" rel="noopener">Mental Floss</a>,
+      <a href="https://gamedeveloper.com/design/nintendo-confirms-switch-cartridges-taste-terrible-aren-t-food" target="_blank" rel="noopener">Game Developer</a>,
+      <a href="https://qz.com/922185" target="_blank" rel="noopener">Quartz</a>.</p>
+  </section>
+
+  <section id="game">
+    <div class="kicker">Code</div>
+    <h2>Drag &amp; Debug: an HTML5 game in vanilla JavaScript</h2>
+    <video class="wide" src="media/game-demo.mp4" poster="media/game-poster.jpg" controls preload="none" playsinline></video>
+    <p>A retro arcade game built with plain JavaScript and Canvas, no engine and no external files: drag a selection box around
+      the pixel bugs to delete them in big combos, but don't select your files. Pixel art and sound are 100% generated in code,
+      and it adapts to desktop and mobile, in landscape or portrait.</p>
+  </section>
+
+  <footer>
+    <p>To hire me, send a message on the platform where you found this page.</p>
+  </footer>
+</main>
+</body>
+</html>
